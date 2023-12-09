@@ -1,0 +1,17 @@
+.vscode
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.Python
+.env*
+.tox
+.coverage
+.coverage.*
+.cache
+.git*
+app-db-data
+tests
+**/*.md
+.dockerignore
+Makefile

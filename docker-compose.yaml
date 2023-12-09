@@ -1,0 +1,50 @@
+services:
+  app_db:
+    container_name: app_db
+    hostname: app_db
+    image: postgres:16.1
+    ports:
+      - ${PG_EXTERNAL_PORT}:5432
+    volumes:
+      - ${PWD}/app-db-data:${PGDATA}
+    env_file:
+      - .env
+    networks:
+      - custom
+
+  alembic:
+    container_name: alembic
+    image: app_image:${IMAGE_TAG}
+    entrypoint: ./alembic-entrypoint.sh
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # volumes:
+    #   - ${PWD}/:/srv/
+    depends_on:
+      - app_db
+    networks:
+      - custom
+  app:
+    container_name: app
+    image: app_image:${IMAGE_TAG}
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /srv/src
+    # volumes:
+    #   - ${PWD}/:/srv
+    ports:
+      - "${APP_EXTERNAL_PORT}:8000"
+    depends_on:
+      - app_db
+    networks:
+      - custom
+
+networks:
+  custom:
+    driver: bridge
