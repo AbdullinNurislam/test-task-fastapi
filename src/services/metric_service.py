@@ -20,7 +20,6 @@ class MetricService:
         service = service.scalar()
 
         if service is None:
-            # Если сервис не найден, создаем новый
             new_service = Service(
                 service_name=metric_data.service_name, path=metric_data.path
             )
@@ -38,7 +37,6 @@ class MetricService:
     async def get_metrics(self, service_name: str):
         metrics = (
             select(
-                Service.service_name,
                 Service.path,
                 func.min(Metric.response_time_ms).label("min"),
                 func.max(Metric.response_time_ms).label("max"),
@@ -49,8 +47,9 @@ class MetricService:
             )
             .select_from(Metric)
             .join(Service, Metric.service_id == Service.id)
-            .group_by(Service.service_name, Service.path)
             .filter(Service.service_name == service_name)
+            .group_by(Service.path)
+            .order_by(Service.path)
         )
         result = await self.session.execute(metrics)
         result = result.all()

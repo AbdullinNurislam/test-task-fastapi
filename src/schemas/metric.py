@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import datetime
+from typing import List
 
 
 class Metrics(BaseModel):
@@ -12,13 +12,27 @@ class MetricsResponse(BaseModel):
     status: str
 
 
-class ServicesResponse(BaseModel):
-    service_name: str
+class ServiceMetrics(BaseModel):
     path: str
+    average: float
     min: float
     max: float
-    average: float
     p99: float
 
     class Config:
         from_attributes = True
+
+
+class Pagination(BaseModel):
+    page: int
+    page_size: int
+    pages: int
+    total: int
+
+
+class ServiceMetricsResponse(BaseModel):
+    pagination: Pagination
+    result: List[ServiceMetrics]
+
+class Message404Response(BaseModel):
+    detail: str
